@@ -38,6 +38,13 @@ window.SpeakX.situations = {
       src: "assets/kirana_training_video.mp4",
       badge: "Kirana Shop",
     },
+    // Home card shown AFTER this situation's lesson is completed.
+    // (Not implemented yet — card only.)
+    nextHomeCard: {
+      title: "Aaj ki Grammar",
+      subtitle: "Sentence banana seekho",
+      locked: true,
+    },
     tasks: [
       {
         id: "greeting",
@@ -45,6 +52,43 @@ window.SpeakX.situations = {
         title: "Shopkeeper ko greet karo",
         logLabel: "Greeting",
         modules: ["video", "speaking", "readAlong", "rolePlay", "aiCall"],
+        // ---- The actual lesson (data-driven, reused by every step) ----
+        lesson: {
+          sentence: {
+            en: "Hello, I want cookies.",
+            hi: "नमस्ते, मुझे बिस्कुट चाहिए।",
+          },
+          audio: "assets/sentence_hello_cookies.mp3",
+          images: {
+            shop: "assets/kirana_shop.jpg",
+            shopkeeper: "assets/shopkeeper.jpg",
+          },
+          coinPerStep: 2,
+          // The reusable lesson pipeline. Same shape powers future lessons.
+          steps: [
+            { type: "listen" },
+            { type: "speak" },
+            {
+              type: "arrange",
+              words: ["Hello", "I", "want", "cookies"],
+              answer: ["Hello", "I", "want", "cookies"],
+            },
+            {
+              type: "fillBlank",
+              // sentence split around the blank
+              before: "Hello, I",
+              after: "cookies.",
+              options: ["am", "want", "are"],
+              answer: "want",
+            },
+            {
+              type: "realLife",
+              shopkeeperLine: "Namaste ji, kya chahiye?",
+              question: "Aap English mein kya bolenge?",
+              answer: "Hello, I want cookies.",
+            },
+          ],
+        },
       },
       {
         id: "price",
@@ -52,6 +96,7 @@ window.SpeakX.situations = {
         title: "Price pucho",
         logLabel: "Price",
         modules: ["video", "speaking", "readAlong", "rolePlay", "aiCall"],
+        lesson: null, // (demo auto-completes this)
       },
       {
         id: "payment",
@@ -59,6 +104,7 @@ window.SpeakX.situations = {
         title: "Payment karo",
         logLabel: "Payment",
         modules: ["video", "speaking", "readAlong", "rolePlay", "aiCall"],
+        lesson: null, // (demo auto-completes this)
       },
     ],
   },

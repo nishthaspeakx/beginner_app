@@ -1,131 +1,123 @@
 /* ============================================================
-   SCREEN 2 — SITUATION LEARNING
-   Data-driven from window.SpeakX.situations[id].
-   - Top media (kirana video) ~38% screen height
-   - "Aaj hum seekhenge" + context line
-   - Progress: x/3 Complete
-   - Exactly 3 clean task cards (icon + title + chevron only)
-   - Tapping a task: console.log + placeholder, marks complete,
-     updates progress. Modular: future video/speaking/roleplay/
-     AI screens attach via task.modules without changing layout.
+   SCREEN 2 — SITUATION (TASK LIST)
+   Reads shared state so progress persists across the lesson.
+   - Tap a task with a lesson -> opens the lesson pipeline.
+   - opts.runDemo: after returning from task 1, auto-completes the
+     remaining tasks (demo), celebrates, then opens Lesson Complete.
    ============================================================ */
 window.SpeakX = window.SpeakX || {};
 
-window.SpeakX.SituationScreen = function (root, { situationId, onClose, onOpenTask }) {
+window.SpeakX.SituationScreen = function (root, opts) {
+  const { situationId, onClose, onOpenTask, runDemo, onAllComplete } = opts;
   const ui = window.SpeakX.ui;
   const el = ui.el.bind(ui);
+  const state = window.SpeakX.state;
   const situation = window.SpeakX.situations[situationId];
-
-  // per-session progress state
-  const completed = new Set();
   const total = situation.tasks.length;
 
-  // ---- Header: close + progress bar + translate + coins ----
+  // ---- Header ----
   const progressFill = el("div", { class: "progress-fill" });
   const header = el("div", { class: "lesson-appbar" }, [
     el("button", { class: "close-btn", title: "Close", onClick: onClose }, "✕"),
     el("div", { class: "progress-track" }, [progressFill]),
     ui.translatePill(),
-    ui.coinPill(2),
+    ui.coinPill(state.coins),
   ]);
 
-  // ---- Media area ----
-  let media;
-  if (situation.media.type === "video") {
-    const video = el("video", {
-      src: situation.media.src,
-      muted: "",
-      loop: "",
-      autoplay: "",
-      playsinline: "",
-      preload: "auto",
-    });
-    video.muted = true;
-    const soundBtn = el("button", { class: "sound-toggle", title: "Sound" }, "🔇");
-    soundBtn.addEventListener("click", () => {
-      video.muted = !video.muted;
-      soundBtn.textContent = video.muted ? "🔇" : "🔊";
-      if (!video.muted) video.play().catch(() => {});
-    });
-    media = el("div", { class: "lesson-media" }, [
-      video,
-      el("div", { class: "media-badge" }, situation.media.badge || "Lesson"),
-      soundBtn,
-    ]);
-  } else {
-    // image placeholder fallback
-    media = el("div", { class: "lesson-media" }, [
-      el("img", {
-        src: situation.media.src,
-        style: "width:100%;height:100%;object-fit:cover;",
-        alt: situation.media.badge || "Lesson",
-      }),
-      el("div", { class: "media-badge" }, situation.media.badge || "Lesson"),
-    ]);
-  }
+  // ---- Media ----
+  const video = el("video", { src: situation.media.src, muted: "", loop: "", autoplay: "", playsinline: "", preload: "auto" });
+  video.muted = true;
+  const soundBtn = el("button", { class: "sound-toggle", title: "Sound" }, "🔇");
+  soundBtn.addEventListener("click", () => {
+    video.muted = !video.muted;
+    soundBtn.textContent = video.muted ? "🔇" : "🔊";
+    if (!video.muted) video.play().catch(() => {});
+  });
+  const media = el("div", { class: "lesson-media" }, [
+    video, el("div", { class: "media-badge" }, situation.media.badge || "Lesson"), soundBtn,
+  ]);
 
   // ---- Context ----
   const context = el("div", { class: "lesson-section" }, [
-    el("p", { class: "eyebrow" }, situation.learnTitle), // "Aaj hum seekhenge"
-    el("p", { class: "context-line" }, [
-      el("span", { class: "emoji" }, situation.contextEmoji),
-      situation.contextText, // "Shopkeeper se English mein baat karna"
-    ]),
+    el("p", { class: "eyebrow" }, situation.learnTitle),
+    el("p", { class: "context-line" }, [el("span", { class: "emoji" }, situation.contextEmoji), situation.contextText]),
   ]);
 
   // ---- Progress label ----
-  const progressCount = el("span", { class: "count" }, `0/${total} Complete`);
-  const progressRow = el("div", { class: "progress-row" }, [
-    el("span", { class: "label" }, "Progress"),
-    progressCount,
-  ]);
+  const progressCount = el("span", { class: "count" }, "");
+  const progressRow = el("div", { class: "progress-row" }, [el("span", { class: "label" }, "Progress"), progressCount]);
 
-  // ---- Task list (icon + title + chevron only) ----
+  // ---- Task list ----
   const list = el("div", { class: "task-list" });
+  const cardById = {};
 
-  function refreshProgress() {
-    const done = completed.size;
+  function refresh() {
+    const done = state.completedCount(situationId);
     progressCount.textContent = `${done}/${total} Complete`;
     progressFill.style.width = `${(done / total) * 100}%`;
   }
 
+  function markDone(taskId) {
+    state.markTask(situationId, taskId);
+    cardById[taskId].classList.add("done");
+    refresh();
+  }
+
   situation.tasks.forEach((task) => {
-    const card = el(
-      "div",
-      { class: "task-card", "data-task": task.id, role: "button", tabindex: "0" },
-      [
-        el("div", { class: "task-icon" }, task.icon),
-        el("div", { class: "task-title" }, task.title),
-        el("div", { class: "task-right" }, [
-          el("span", { class: "chevron" }, "›"),
-          el("span", { class: "task-check" }, "✓"),
-        ]),
-      ]
-    );
+    const card = el("div", { class: "task-card", "data-task": task.id, role: "button", tabindex: "0" }, [
+      el("div", { class: "task-icon" }, task.icon),
+      el("div", { class: "task-title" }, task.title),
+      el("div", { class: "task-right" }, [el("span", { class: "chevron" }, "›"), el("span", { class: "task-check" }, "✓")]),
+    ]);
+    if (state.taskDone(situationId, task.id)) card.classList.add("done");
 
     const handle = () => {
-      // ---- placeholder navigation hook (modular) ----
-      console.log("Task Selected:", task.logLabel, "| modules:", task.modules);
-      onOpenTask(situation, task);
-
-      // mark complete + update progress
-      if (!completed.has(task.id)) {
-        completed.add(task.id);
-        card.classList.add("done");
-        refreshProgress();
+      if (state.taskDone(situationId, task.id)) return;
+      if (task.lesson) {
+        console.log("Task Selected:", task.logLabel, "| modules:", task.modules);
+        onOpenTask(situation, task);
+      } else {
+        ui.toast("Pehle Task 1 complete karo 🙂");
       }
     };
     card.addEventListener("click", handle);
-    card.addEventListener("keydown", (e) => {
-      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); handle(); }
-    });
+    card.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); handle(); } });
     list.appendChild(card);
+    cardById[task.id] = card;
   });
 
   const body = el("div", { class: "screen-body" }, [media, context, progressRow, list]);
-
   root.appendChild(header);
   root.appendChild(body);
+  refresh();
 
-  refreshProgress();
+  // ---- DEMO: auto-complete remaining tasks then celebrate ----
+  if (runDemo) {
+    const remaining = situation.tasks.filter((t) => !state.taskDone(situationId, t.id));
+    setTimeout(() => {
+      remaining.forEach((t, i) => setTimeout(() => markDone(t.id), i * 550));
+      const afterAll = remaining.length * 550 + 500;
+      setTimeout(() => {
+        celebrate(root);
+        setTimeout(() => onAllComplete && onAllComplete(), 1400);
+      }, afterAll);
+    }, 1000);
+  }
 };
+
+/* simple confetti burst reused on the task list */
+function celebrate(root) {
+  const ui = window.SpeakX.ui;
+  const burst = ui.el("div", { class: "celebrate" });
+  const colors = ["#F4701E", "#37B24D", "#6A5BFF", "#F6C544", "#FF7AA8"];
+  for (let i = 0; i < 36; i++) {
+    const c = ui.el("div", { class: "confetti" });
+    c.style.left = Math.round((i / 36) * 100) + "%";
+    c.style.background = colors[i % colors.length];
+    c.style.animationDuration = 1.7 + (i % 6) * 0.25 + "s";
+    c.style.animationDelay = (i % 8) * 0.07 + "s";
+    burst.appendChild(c);
+  }
+  root.appendChild(burst);
+  setTimeout(() => burst.remove(), 4000);
+}

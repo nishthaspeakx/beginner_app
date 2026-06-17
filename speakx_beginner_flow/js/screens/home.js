@@ -20,7 +20,7 @@ window.SpeakX.HomeScreen = function (root, { onStart }) {
     ]),
     el("div", { class: "spacer" }),
     ui.translatePill(),
-    ui.coinPill(0),
+    ui.coinPill(window.SpeakX.state.coins),
   ]);
 
   const body = el("div", { class: "screen-body" }, [
@@ -40,17 +40,42 @@ window.SpeakX.HomeScreen = function (root, { onStart }) {
     ]),
 
     // Lesson popover card — TEXT UPDATED, styling untouched
-    el("div", { class: "lesson-pop" }, [
-      el("h3", {}, situation.home.title),                 // "Aaj ke Sentences"
-      el("div", { class: "sub" }, situation.home.subtitle), // "Video dekho aur 3 baatein bolna seekho"
-      el("button", { class: "btn-start", onClick: () => onStart(situation.id) }, [
-        "Start",
-        el("span", { class: "gift-pill" }, ["🎁", "Surprise Gift"]),
-      ]),
-    ]),
+    lessonCard(),
+
+    // Next card appears once the situation is complete
+    nextCard(),
 
     el("div", { style: "height:18px" }),
   ]);
+
+  function lessonCard() {
+    const done = window.SpeakX.state.isLessonDone(situation.id);
+    const card = el("div", { class: "lesson-pop" }, [
+      done ? el("div", { class: "done-badge" }, [el("span", {}, "✓"), "Completed"]) : null,
+      el("h3", {}, situation.home.title),                  // "Aaj ke Sentences"
+      el("div", { class: "sub" }, situation.home.subtitle), // "Video dekho aur 3 baatein bolna seekho"
+      el("button", { class: "btn-start", onClick: () => onStart(situation.id) }, [
+        done ? "Review" : "Start",
+        el("span", { class: "gift-pill" }, ["🎁", "Surprise Gift"]),
+      ]),
+    ]);
+    return card;
+  }
+
+  function nextCard() {
+    if (!window.SpeakX.state.isLessonDone(situation.id) || !situation.nextHomeCard) {
+      return el("div", { class: "hidden" });
+    }
+    const nc = situation.nextHomeCard;
+    return el("div", { class: "lesson-pop", style: "margin-top:22px" }, [
+      el("h3", {}, nc.title),               // "Aaj ki Grammar"
+      el("div", { class: "sub" }, nc.subtitle), // "Sentence banana seekho"
+      el("button", {
+        class: "btn-start",
+        onClick: () => ui.toast("Aaj ki Grammar — coming soon 🚧"),
+      }, "Start"),
+    ]);
+  }
 
   root.appendChild(header);
   root.appendChild(body);

@@ -345,3 +345,164 @@ html, body {
 .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
 .hidden { display: none !important; }
+
+/* ============================================================
+   LESSON FLOW (Listen / Speak / Arrange / Fill Blank / Real Life)
+   Reuses existing tokens; mirrors the reference screenshots.
+   ============================================================ */
+.lesson-body { flex: 1 1 auto; overflow-y: auto; display: flex; flex-direction: column; }
+.lesson-body .grow { flex: 1; }
+
+/* faint background watermark like the reference screens */
+.lesson-body::before {
+  content: ""; position: absolute; inset: 90px 0 0; z-index: 0;
+  background: radial-gradient(circle at 50% 22%, rgba(244,112,30,.05), transparent 60%);
+  pointer-events: none;
+}
+.lesson-body > * { position: relative; z-index: 1; }
+
+/* Audio buttons */
+.audio-btn {
+  width: 54px; height: 54px; border-radius: 50%; border: none; cursor: pointer;
+  background: #EEF1F4; color: #6B7280; font-size: 22px;
+  display: inline-flex; align-items: center; justify-content: center; flex: 0 0 auto;
+}
+.audio-btn.primary { background: var(--primary); color: #fff; box-shadow: 0 8px 18px rgba(244,112,30,.32); }
+.audio-btn.center { margin: 22px auto 0; display: flex; }
+.audio-btn.playing { animation: a-pulse 0.9s ease infinite; }
+@keyframes a-pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.09); } }
+
+/* Photo (kirana / shopkeeper) */
+.lesson-photo {
+  margin: 10px 16px 0; border-radius: var(--radius-lg); overflow: hidden;
+  height: 30vh; max-height: 270px; min-height: 160px; background: #11131A; box-shadow: var(--shadow-card);
+}
+.lesson-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.lesson-photo.avatar { height: auto; min-height: 0; width: 130px; margin: 8px auto 0; border-radius: 50%; aspect-ratio: 1; }
+
+/* Sentence card */
+.sentence-card {
+  margin: 20px 18px 0; background: #fff; border: 1.5px solid var(--border);
+  border-radius: var(--radius-lg); padding: 22px 20px; text-align: center; box-shadow: var(--shadow-card);
+}
+.sentence-card.active { border-color: var(--primary); }
+.sentence-card.correct { border-color: #37B24D; background: #F2FBF4; }
+.sentence-card .en { font-size: 23px; font-weight: 700; color: var(--text); }
+.sentence-card.correct .en { color: #2B8A3E; }
+.sentence-card .divider { border-top: 1px dashed #D5DAE0; margin: 14px 26px; }
+.sentence-card .hi { font-size: 16px; color: var(--text-muted); }
+.listen-line { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 18px; }
+.listen-line .lbl { font-weight: 700; color: var(--primary); }
+
+/* Speak controls */
+.speak-label { text-align: center; margin-top: 8px; }
+.speak-tooltip {
+  display: inline-block; background: var(--primary-soft); color: var(--text); font-weight: 700;
+  padding: 8px 16px; border-radius: 14px; position: relative;
+}
+.speak-tooltip::after {
+  content: ""; position: absolute; left: 50%; bottom: -7px; transform: translateX(-50%) rotate(45deg);
+  width: 14px; height: 14px; background: var(--primary-soft);
+}
+.mic-row { display: flex; align-items: center; justify-content: center; gap: 26px; padding: 14px 0 22px; }
+.mic-btn {
+  width: 84px; height: 84px; border-radius: 50%; border: none; cursor: pointer;
+  background: var(--primary); color: #fff; font-size: 30px;
+  display: inline-flex; align-items: center; justify-content: center;
+  box-shadow: 0 0 0 8px rgba(244,112,30,.16), 0 10px 22px rgba(244,112,30,.4);
+}
+.mic-btn.listening { animation: mic-pulse 0.9s ease infinite; }
+@keyframes mic-pulse {
+  0%,100% { box-shadow: 0 0 0 6px rgba(244,112,30,.22), 0 10px 22px rgba(244,112,30,.4); }
+  50%     { box-shadow: 0 0 0 20px rgba(244,112,30,.06), 0 10px 22px rgba(244,112,30,.4); }
+}
+.side-btn {
+  min-width: 48px; height: 48px; padding: 0 16px; border-radius: 14px; border: 1px solid var(--border);
+  background: #fff; cursor: pointer; font-size: 17px; font-weight: 600; color: var(--text);
+  display: inline-flex; align-items: center; justify-content: center;
+}
+
+/* Instruction heading */
+.lesson-instruction { padding: 16px 18px 0; }
+.lesson-instruction h2 { font-size: 20px; font-weight: 700; margin: 0; }
+
+/* Arrange words */
+.answer-slots {
+  min-height: 56px; margin: 18px 16px 0; border-bottom: 2px solid var(--border);
+  display: flex; flex-wrap: wrap; gap: 10px; padding-bottom: 12px;
+}
+.answer-slots.correct { border-color: #37B24D; }
+.answer-slots.wrong { border-color: #E03131; }
+.chips-bank { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; padding: 26px 16px 0; }
+.chip {
+  background: #fff; border: 1px solid var(--border); border-radius: 14px; padding: 12px 18px;
+  font-size: 16px; font-weight: 600; cursor: pointer; box-shadow: 0 2px 0 rgba(17,24,39,.06); user-select: none;
+}
+.chip.used { opacity: .32; pointer-events: none; }
+.chip.in-answer { background: var(--primary-soft); border-color: #F6C9A8; }
+
+/* MCQ options */
+.options { padding: 8px 18px 0; display: flex; flex-direction: column; gap: 14px; }
+.option-card {
+  border: 1.5px solid var(--border); border-radius: 16px; padding: 18px; text-align: center;
+  font-size: 18px; font-weight: 700; background: #fff; cursor: pointer; box-shadow: var(--shadow-card); color: var(--text);
+}
+.option-card.correct { border-color: #37B24D; background: #F2FBF4; color: #2B8A3E; }
+.option-card.wrong { border-color: #E03131; background: #FFF5F5; color: #C92A2A; }
+.option-card.locked { pointer-events: none; }
+
+/* Real-life conversation */
+.convo-card {
+  margin: 18px 18px 0; background: #fff; border: 1px solid var(--border); border-radius: var(--radius-lg);
+  padding: 18px; box-shadow: var(--shadow-card);
+}
+.convo-line { display: flex; gap: 10px; align-items: center; font-size: 17px; font-weight: 600; }
+.convo-q { margin: 20px 18px 0; font-size: 18px; font-weight: 700; text-align: center; }
+.answer-btn {
+  margin: 18px; width: calc(100% - 36px); border: 2px solid var(--primary); background: var(--primary-soft);
+  color: var(--text); font-size: 18px; font-weight: 700; padding: 18px; border-radius: 16px; cursor: pointer;
+}
+.answer-btn.correct { border-color: #37B24D; background: #F2FBF4; color: #2B8A3E; }
+
+/* Footer / continue */
+.lesson-footer { padding: 16px 18px calc(16px + env(safe-area-inset-bottom)); }
+.btn-continue {
+  width: 100%; border: none; border-radius: 16px; padding: 17px; font-size: 18px; font-weight: 700;
+  color: #fff; cursor: pointer; background: var(--primary); box-shadow: 0 8px 18px rgba(244,112,30,.3);
+}
+.btn-continue:disabled { opacity: .4; cursor: default; box-shadow: none; }
+.btn-continue.green { background: #37B24D; box-shadow: 0 8px 18px rgba(55,178,77,.3); }
+
+/* Success panel */
+.success-panel {
+  position: sticky; bottom: 0; z-index: 5;
+  background: #fff; border-top: 1px solid #E7F5EC;
+  padding: 16px 18px calc(16px + env(safe-area-inset-bottom)); box-shadow: 0 -8px 24px rgba(0,0,0,.06);
+}
+/* keep the orange Continue (Listen step) pinned too */
+.lesson-footer { position: sticky; bottom: 0; background: #fff; z-index: 5; }
+.success-panel .head { display: flex; align-items: center; gap: 10px; font-size: 19px; font-weight: 800; color: #2B8A3E; margin-bottom: 12px; }
+.success-panel .check { width: 26px; height: 26px; border-radius: 50%; background: #37B24D; color: #fff; display: inline-flex; align-items: center; justify-content: center; font-size: 15px; }
+
+/* Lesson complete */
+.complete-screen { display: flex; flex-direction: column; height: 100%; text-align: center; padding: 0 24px; }
+.complete-body { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.complete-emoji { font-size: 84px; line-height: 1; }
+.complete-screen h1 { font-size: 26px; font-weight: 800; margin: 14px 0 6px; }
+.complete-screen .msg { color: var(--text-muted); font-size: 15px; margin: 0 6px; }
+.learned-pill {
+  margin-top: 20px; background: #F2FBF4; border: 1px solid #C3E6CB; color: #2B8A3E; font-weight: 700;
+  padding: 12px 18px; border-radius: 14px; display: inline-flex; gap: 8px; align-items: center;
+}
+
+/* Home: completed + locked next card */
+.done-badge {
+  position: absolute; top: -12px; right: 16px; background: #37B24D; color: #fff;
+  font-size: 12px; font-weight: 700; padding: 6px 12px; border-radius: 20px; display: inline-flex; gap: 6px; align-items: center;
+}
+.btn-start.locked { background: #C9CED6; box-shadow: none; cursor: pointer; }
+
+/* Confetti celebration */
+.celebrate { position: absolute; inset: 0; pointer-events: none; overflow: hidden; z-index: 40; }
+.confetti { position: absolute; top: -24px; width: 9px; height: 14px; border-radius: 2px; animation: fall linear forwards; }
+@keyframes fall { to { transform: translateY(115vh) rotate(560deg); opacity: .85; } }

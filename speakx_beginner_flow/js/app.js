@@ -1,37 +1,58 @@
 /* ============================================================
    APP ROUTER
-   Minimal screen router. Each screen is a pure render function
-   that paints into #app. Swapping the Vocabulary flow for the
-   new Situation flow happens entirely here (onStart).
+   Full demo flow:
+   Home → Task List → Lesson (Listen→Speak→Arrange→FillBlank→RealLife)
+        → Task 1 complete → (demo) auto-complete rest → celebrate
+        → Lesson Complete → Home (card completed + next card)
    ============================================================ */
 (function () {
   const root = document.getElementById("app");
   const ui = window.SpeakX.ui;
+  const state = window.SpeakX.state;
 
-  function clear() {
-    root.innerHTML = "";
-  }
+  const clear = () => (root.innerHTML = "");
 
   const router = {
     home() {
       clear();
-      window.SpeakX.HomeScreen(root, {
-        // Start button no longer opens "Vocabulary" — opens the situation lesson.
-        onStart: (situationId) => router.situation(situationId),
-      });
+      window.SpeakX.HomeScreen(root, { onStart: (sid) => router.taskList(sid) });
     },
 
-    situation(situationId) {
+    // taskList accepts a flag to run the demo auto-complete after task 1
+    taskList(situationId, runDemo) {
       clear();
       window.SpeakX.SituationScreen(root, {
         situationId,
+        runDemo: !!runDemo,
         onClose: () => router.home(),
-        onOpenTask: (situation, task) => {
-          // PLACEHOLDER for future lesson screens (video / speaking /
-          // read along / role play / AI). Architecture is ready —
-          // just route here based on task.modules later.
-          ui.toast(`▶ ${task.title}  ·  (placeholder)`);
+        onOpenTask: (situation, task) => router.lesson(situation.id, task.id),
+        onAllComplete: () => router.lessonComplete(situationId),
+      });
+    },
+
+    lesson(situationId, taskId) {
+      clear();
+      window.SpeakX.LessonScreen(root, {
+        situationId,
+        taskId,
+        onExit: (completed) => {
+          if (completed) {
+            state.markTask(situationId, taskId);
+            // back to task list, which will run the demo auto-complete
+            router.taskList(situationId, true);
+          } else {
+            router.taskList(situationId, false);
+          }
         },
+      });
+    },
+
+    lessonComplete(situationId) {
+      clear();
+      state.markLessonDone(situationId);
+      window.SpeakX.LessonCompleteScreen(root, {
+        situationId,
+        onContinue: () => router.home(),
       });
     },
   };
