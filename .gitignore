@@ -1,0 +1,6 @@
+.DS_Store
+.claude/settings.local.json
+node_modules/
+*.log
+
+.claude/scheduled_tasks.lock
