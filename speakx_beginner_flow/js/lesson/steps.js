@@ -43,6 +43,31 @@ window.SpeakX = window.SpeakX || {};
     return btn;
   }
 
+  // Top media: real image if the lesson has one, else a placeholder card.
+  // (Grammar lesson uses a placeholder until a real video is uploaded.)
+  function mediaBlock(ctx) {
+    const lesson = ctx.lesson;
+    if (lesson.images && lesson.images.shop) {
+      return el("div", { class: "lesson-photo" }, [el("img", { src: lesson.images.shop, alt: "Lesson" })]);
+    }
+    return el("div", { class: "lesson-photo placeholder" }, [
+      el("div", { class: "media-badge" }, lesson.placeholderLabel || "Practice"),
+      el("div", { class: "ph-inner" }, [
+        el("div", { class: "ph-emoji" }, "🎬"),
+        el("div", { class: "ph-sub" }, "Video coming soon"),
+      ]),
+    ]);
+  }
+
+  // Speaker avatar: shopkeeper image if present, else an emoji avatar.
+  function avatarBlock(ctx) {
+    const lesson = ctx.lesson;
+    if (lesson.images && lesson.images.shopkeeper) {
+      return el("div", { class: "lesson-photo avatar" }, [el("img", { src: lesson.images.shopkeeper, alt: "Speaker" })]);
+    }
+    return el("div", { class: "lesson-photo avatar emoji-avatar" }, [el("span", {}, "🗣️")]);
+  }
+
   // Green success footer used by most steps
   S.SuccessPanel = function (message, onContinue) {
     const panel = el("div", { class: "success-panel" }, [
@@ -54,12 +79,14 @@ window.SpeakX = window.SpeakX || {};
 
   /* ---------------- SCREEN 1: Listen & Understand ---------------- */
   S.listen = function (ctx, mount) {
-    mount.appendChild(
-      el("div", { class: "lesson-photo" }, [
-        el("img", { src: ctx.lesson.images.shop, alt: "Kirana shop" }),
-      ])
-    );
+    mount.appendChild(mediaBlock(ctx));
     mount.appendChild(sentenceCard(ctx.lesson));
+    // optional context chip (e.g. "Abhi / Now") — beginner-friendly "when to say it"
+    if (ctx.step.chip) {
+      mount.appendChild(
+        el("div", { class: "chip-row" }, [el("span", { class: "context-chip" }, ctx.step.chip)])
+      );
+    }
     mount.appendChild(
       el("div", { class: "listen-line" }, [audioButton(ctx, { primary: true }), el("span", { class: "lbl" }, "Listen")])
     );
@@ -79,11 +106,7 @@ window.SpeakX = window.SpeakX || {};
   /* ---------------- SCREEN 2: Speak Now ---------------- */
   S.speak = function (ctx, mount) {
     mount.appendChild(audioButton(ctx, { cls: "center" }));
-    mount.appendChild(
-      el("div", { class: "lesson-photo avatar" }, [
-        el("img", { src: ctx.lesson.images.shopkeeper, alt: "Shopkeeper" }),
-      ])
-    );
+    mount.appendChild(avatarBlock(ctx));
     const card = sentenceCard(ctx.lesson, "active");
     mount.appendChild(card);
     mount.appendChild(el("div", { class: "grow" }));
@@ -250,6 +273,36 @@ window.SpeakX = window.SpeakX || {};
       ctx.playAudio();
       ctx.addCoins();
       footerHolder.appendChild(S.SuccessPanel("CORRECT!", ctx.done));
+    });
+  };
+
+  /* ---------------- MCQ (question + helper + options) ---------------- */
+  S.mcq = function (ctx, mount) {
+    mount.appendChild(el("div", { class: "lesson-instruction" }, [el("h2", {}, ctx.step.question)]));
+    if (ctx.step.helper) mount.appendChild(el("p", { class: "mcq-helper" }, ctx.step.helper));
+
+    const opts = el("div", { class: "options" });
+    mount.appendChild(opts);
+    mount.appendChild(el("div", { class: "grow" }));
+    const footerHolder = el("div", {});
+    mount.appendChild(footerHolder);
+
+    ctx.step.options.forEach((opt) => {
+      const card = el("div", { class: "option-card", role: "button", tabindex: "0" }, opt);
+      const choose = () => {
+        if (opt === ctx.step.answer) {
+          card.classList.add("correct");
+          opts.querySelectorAll(".option-card").forEach((c) => c.classList.add("locked"));
+          ctx.addCoins();
+          footerHolder.appendChild(S.SuccessPanel("GREAT JOB!", ctx.done));
+        } else {
+          card.classList.add("wrong");
+          setTimeout(() => card.classList.remove("wrong"), 700);
+        }
+      };
+      card.addEventListener("click", choose);
+      card.addEventListener("keydown", (e) => { if (e.key === "Enter") choose(); });
+      opts.appendChild(card);
     });
   };
 })();

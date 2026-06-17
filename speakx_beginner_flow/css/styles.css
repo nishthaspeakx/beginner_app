@@ -502,6 +502,37 @@ html, body {
 }
 .btn-start.locked { background: #C9CED6; box-shadow: none; cursor: pointer; }
 
+/* Placeholder media (no video uploaded yet) */
+.lesson-media.placeholder, .lesson-photo.placeholder {
+  background: linear-gradient(135deg, #FFF1E8 0%, #F3EEFF 100%);
+  display: flex; align-items: center; justify-content: center;
+}
+.lesson-media.placeholder .ph-inner, .lesson-photo.placeholder .ph-inner {
+  text-align: center; color: var(--text-muted);
+}
+.ph-emoji { font-size: 40px; }
+.ph-sub { font-size: 13px; font-weight: 600; margin-top: 4px; }
+.lesson-photo.placeholder { min-height: 150px; }
+
+/* Emoji avatar (speak step without a real image) */
+.lesson-photo.emoji-avatar {
+  background: var(--primary-soft); display: flex; align-items: center; justify-content: center;
+}
+.lesson-photo.emoji-avatar span { font-size: 56px; }
+
+/* Context chip (Listen step "when to say it") */
+.chip-row { display: flex; justify-content: center; margin-top: 16px; }
+.context-chip {
+  background: var(--primary-soft); color: var(--primary-strong); font-weight: 700;
+  padding: 8px 16px; border-radius: 20px; font-size: 14px; border: 1px solid #F6C9A8;
+}
+
+/* Context subtitle on the task-list screen */
+.context-sub { margin: 6px 0 0; color: var(--text-muted); font-size: 15px; }
+
+/* MCQ helper line */
+.mcq-helper { padding: 6px 18px 4px; margin: 0; color: var(--text-muted); font-size: 16px; }
+
 /* Confetti celebration */
 .celebrate { position: absolute; inset: 0; pointer-events: none; overflow: hidden; z-index: 40; }
 .confetti { position: absolute; top: -24px; width: 9px; height: 14px; border-radius: 2px; animation: fall linear forwards; }

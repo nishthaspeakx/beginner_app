@@ -32,15 +32,22 @@
 
     lesson(situationId, taskId) {
       clear();
+      const situation = window.SpeakX.situations[situationId];
       window.SpeakX.LessonScreen(root, {
         situationId,
         taskId,
         onExit: (completed) => {
-          if (completed) {
-            state.markTask(situationId, taskId);
-            // back to task list, which will run the demo auto-complete
+          if (!completed) { router.taskList(situationId, false); return; }
+          state.markTask(situationId, taskId);
+
+          const allDone = situation.tasks.every((t) => state.taskDone(situationId, t.id));
+          if (allDone) {
+            router.lessonComplete(situationId);
+          } else if (situation.autoCompleteAfterFirst) {
+            // kirana demo: auto-complete remaining tasks, then Lesson Complete
             router.taskList(situationId, true);
           } else {
+            // grammar etc: show progress, learner taps the next task
             router.taskList(situationId, false);
           }
         },

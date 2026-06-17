@@ -19,11 +19,12 @@ window.SpeakX.LessonCompleteScreen = function (root, { situationId, onContinue }
     el("div", { class: "learned-pill" }, [el("span", {}, "✅"), s])
   );
 
+  const complete = situation.complete || { title: "Lesson Complete", message: "" };
   const screen = el("div", { class: "complete-screen" }, [
     el("div", { class: "complete-body" }, [
       el("div", { class: "complete-emoji" }, "🎉"),
-      el("h1", {}, "Lesson Complete"),
-      el("p", { class: "msg" }, "Aaj aapne shopkeeper se English mein baat karna seekha."),
+      el("h1", {}, complete.title),
+      el("p", { class: "msg" }, complete.message),
       ...learnedPills,
     ]),
     el("div", { class: "lesson-footer" }, [

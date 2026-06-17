@@ -24,23 +24,39 @@ window.SpeakX.SituationScreen = function (root, opts) {
     ui.coinPill(state.coins),
   ]);
 
-  // ---- Media ----
-  const video = el("video", { src: situation.media.src, muted: "", loop: "", autoplay: "", playsinline: "", preload: "auto" });
-  video.muted = true;
-  const soundBtn = el("button", { class: "sound-toggle", title: "Sound" }, "🔇");
-  soundBtn.addEventListener("click", () => {
-    video.muted = !video.muted;
-    soundBtn.textContent = video.muted ? "🔇" : "🔊";
-    if (!video.muted) video.play().catch(() => {});
-  });
-  const media = el("div", { class: "lesson-media" }, [
-    video, el("div", { class: "media-badge" }, situation.media.badge || "Lesson"), soundBtn,
-  ]);
+  // ---- Media (video / image / placeholder) ----
+  const media = buildMedia(situation.media);
+
+  function buildMedia(m) {
+    if (m.type === "video") {
+      const video = el("video", { src: m.src, muted: "", loop: "", autoplay: "", playsinline: "", preload: "auto" });
+      video.muted = true;
+      const soundBtn = el("button", { class: "sound-toggle", title: "Sound" }, "🔇");
+      soundBtn.addEventListener("click", () => {
+        video.muted = !video.muted;
+        soundBtn.textContent = video.muted ? "🔇" : "🔊";
+        if (!video.muted) video.play().catch(() => {});
+      });
+      return el("div", { class: "lesson-media" }, [video, el("div", { class: "media-badge" }, m.badge || "Lesson"), soundBtn]);
+    }
+    if (m.type === "image") {
+      return el("div", { class: "lesson-media" }, [
+        el("img", { src: m.src, style: "width:100%;height:100%;object-fit:cover", alt: m.badge || "Lesson" }),
+        el("div", { class: "media-badge" }, m.badge || "Lesson"),
+      ]);
+    }
+    // placeholder (no video yet) — TODO: replace with real video upload
+    return el("div", { class: "lesson-media placeholder" }, [
+      el("div", { class: "media-badge" }, m.badge || "Practice"),
+      el("div", { class: "ph-inner" }, [el("div", { class: "ph-emoji" }, "🎬"), el("div", { class: "ph-sub" }, "Video coming soon")]),
+    ]);
+  }
 
   // ---- Context ----
   const context = el("div", { class: "lesson-section" }, [
     el("p", { class: "eyebrow" }, situation.learnTitle),
     el("p", { class: "context-line" }, [el("span", { class: "emoji" }, situation.contextEmoji), situation.contextText]),
+    situation.contextSub ? el("p", { class: "context-sub" }, situation.contextSub) : null,
   ]);
 
   // ---- Progress label ----

@@ -38,12 +38,11 @@ window.SpeakX.situations = {
       src: "assets/kirana_training_video.mp4",
       badge: "Kirana Shop",
     },
-    // Home card shown AFTER this situation's lesson is completed.
-    // (Not implemented yet — card only.)
-    nextHomeCard: {
-      title: "Aaj ki Grammar",
-      subtitle: "Sentence banana seekho",
-      locked: true,
+    // kirana = first card; after task 1 the demo auto-completes the rest.
+    autoCompleteAfterFirst: true,
+    complete: {
+      title: "Lesson Complete",
+      message: "Aaj aapne shopkeeper se English mein baat karna seekha.",
     },
     tasks: [
       {
@@ -109,6 +108,105 @@ window.SpeakX.situations = {
     ],
   },
 
+  /* ============================================================
+     LESSON 2 — Aaj ki Grammar (grammar_001)
+     Beginner-friendly: NO tense rules. Three useful sentences
+     taught through Listen → Speak → MCQ, mapped to "kab kya bolna".
+     Each task is its own mini-lesson; tasks complete one by one
+     (no demo auto-complete), then the Grammar Complete screen.
+     ============================================================ */
+  grammar: {
+    id: "grammar",
+    emoji: "🗣️",
+    home: { title: "Aaj ki Grammar", subtitle: "Sentence banana seekho" },
+    learnTitle: "Aaj hum seekhenge",
+    contextEmoji: "🗣️",
+    contextText: "3 simple grammar sentences",
+    contextSub: "Kab kya bolna hai",
+    // TODO: replace with a real grammar lesson video when available.
+    media: { type: "placeholder", badge: "Grammar Practice" },
+    placeholderLabel: "Grammar Practice",
+    complete: {
+      title: "Grammar Complete",
+      message: "Aaj aapne 3 simple sentences seekhe.",
+    },
+    coinPerStep: 2,
+    tasks: [
+      {
+        id: "present",
+        icon: "⏰",
+        title: "I am going",
+        logLabel: "Present",
+        lesson: {
+          sentence: { en: "I am going.", hi: "मैं जा रहा हूँ।" },
+          audio: "assets/g_present.mp3", // mocked TTS; swap for real audio later
+          placeholder: true,
+          placeholderLabel: "Grammar Practice",
+          coinPerStep: 2,
+          steps: [
+            { type: "listen", chip: "Abhi / Now" },
+            { type: "speak" },
+            {
+              type: "mcq",
+              question: "Abhi jaana ho toh kya bolenge?",
+              helper: "अभी जाना है",
+              options: ["I am going.", "I was going.", "I will go."],
+              answer: "I am going.",
+            },
+          ],
+        },
+      },
+      {
+        id: "past",
+        icon: "⏪",
+        title: "I was going",
+        logLabel: "Past",
+        lesson: {
+          sentence: { en: "I was going.", hi: "मैं जा रहा था।" },
+          audio: "assets/g_past.mp3",
+          placeholder: true,
+          placeholderLabel: "Grammar Practice",
+          coinPerStep: 2,
+          steps: [
+            { type: "listen", chip: "Pehle / Past" },
+            { type: "speak" },
+            {
+              type: "mcq",
+              question: "Pehle jaana tha toh kya bolenge?",
+              helper: "पहले जा रहा था",
+              options: ["I am going.", "I was going.", "I will go."],
+              answer: "I was going.",
+            },
+          ],
+        },
+      },
+      {
+        id: "future",
+        icon: "⏩",
+        title: "I will go",
+        logLabel: "Future",
+        lesson: {
+          sentence: { en: "I will go.", hi: "मैं जाऊँगा।" },
+          audio: "assets/g_future.mp3",
+          placeholder: true,
+          placeholderLabel: "Grammar Practice",
+          coinPerStep: 2,
+          steps: [
+            { type: "listen", chip: "Baad mein / Future" },
+            { type: "speak" },
+            {
+              type: "mcq",
+              question: "Baad mein jaana ho toh kya bolenge?",
+              helper: "बाद में जाऊँगा",
+              options: ["I am going.", "I was going.", "I will go."],
+              answer: "I will go.",
+            },
+          ],
+        },
+      },
+    ],
+  },
+
   /* ----- FUTURE SITUATIONS (scaffolded, not yet shown) -----
      Uncomment / extend when ready. Same shape = drop-in ready.
 
@@ -129,3 +227,7 @@ window.SpeakX.situations = {
 
 /* Which situation the Home lesson card opens right now. */
 window.SpeakX.activeSituationId = "kirana";
+
+/* Ordered list of lessons shown on Home. A lesson's card appears once
+   the previous lesson is complete (Home gates them in sequence). */
+window.SpeakX.lessonOrder = ["kirana", "grammar"];
