@@ -135,8 +135,8 @@ window.SpeakX.situations = {
     contextEmoji: "🗣️",
     contextText: "3 simple grammar sentences",
     contextSub: "Kab kya bolna hai",
-    // TODO: replace with a real grammar lesson video when available.
-    media: { type: "placeholder", badge: "Grammar Practice" },
+    // Overview video plays with its own audio (sound: true → starts unmuted).
+    media: { type: "video", src: "assets/grammar_overview.mp4", badge: "Grammar Practice", sound: true },
     placeholderLabel: "Grammar Practice",
     complete: {
       title: "Grammar Complete",

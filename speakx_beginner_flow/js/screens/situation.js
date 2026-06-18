@@ -29,15 +29,24 @@ window.SpeakX.SituationScreen = function (root, opts) {
 
   function buildMedia(m) {
     if (m.type === "video") {
-      const video = el("video", { src: m.src, muted: "", loop: "", autoplay: "", playsinline: "", preload: "auto", poster: m.poster || "" });
-      video.muted = true;
-      const soundBtn = el("button", { class: "sound-toggle", title: "Sound" }, "🔇");
-      soundBtn.addEventListener("click", () => {
-        video.muted = !video.muted;
-        soundBtn.textContent = video.muted ? "🔇" : "🔊";
-        if (!video.muted) video.play().catch(() => {});
-      });
-      return el("div", { class: "lesson-media" }, [video, el("div", { class: "media-badge" }, m.badge || "Lesson"), soundBtn]);
+      const video = el("video", { src: m.src, loop: "", autoplay: "", playsinline: "", preload: "auto", poster: m.poster || "" });
+      const children = [video, el("div", { class: "media-badge" }, m.badge || "Lesson")];
+      if (m.sound) {
+        // Play with the video's original audio enabled (no mute toggle).
+        video.muted = false;
+        video.play().catch(() => {});
+      } else {
+        // Default: start muted with a tap-to-unmute toggle.
+        video.muted = true;
+        const soundBtn = el("button", { class: "sound-toggle", title: "Sound" }, "🔇");
+        soundBtn.addEventListener("click", () => {
+          video.muted = !video.muted;
+          soundBtn.textContent = video.muted ? "🔇" : "🔊";
+          if (!video.muted) video.play().catch(() => {});
+        });
+        children.push(soundBtn);
+      }
+      return el("div", { class: "lesson-media" }, children);
     }
     if (m.type === "image") {
       return el("div", { class: "lesson-media" }, [
