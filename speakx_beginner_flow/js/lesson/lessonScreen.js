@@ -19,6 +19,10 @@ window.SpeakX.LessonScreen = function (root, { situationId, taskId, onExit }) {
   // one audio element reused for the whole lesson; speechSynthesis fallback
   const audioEl = new Audio(lesson.audio);
   function playAudio() {
+    // Mute the lesson video for good once Listen is tapped, so the sentence
+    // audio never overlaps the video and the video stays silent afterward.
+    const video = body.querySelector(".lesson-photo video");
+    if (video) video.muted = true;
     try {
       audioEl.currentTime = 0;
       audioEl.play().catch(() => speak());

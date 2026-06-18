@@ -47,6 +47,12 @@ window.SpeakX = window.SpeakX || {};
   // (Grammar lesson uses a placeholder until a real video is uploaded.)
   function mediaBlock(ctx) {
     const lesson = ctx.lesson;
+    if (lesson.video) {
+      const v = el("video", { src: lesson.video, loop: "", autoplay: "", playsinline: "", preload: "auto" });
+      v.muted = false;
+      v.play().catch(() => {});
+      return el("div", { class: "lesson-photo" }, [v]);
+    }
     if (lesson.images && lesson.images.shop) {
       return el("div", { class: "lesson-photo" }, [el("img", { src: lesson.images.shop, alt: "Lesson" })]);
     }
@@ -79,7 +85,8 @@ window.SpeakX = window.SpeakX || {};
 
   /* ---------------- SCREEN 1: Listen & Understand ---------------- */
   S.listen = function (ctx, mount) {
-    mount.appendChild(mediaBlock(ctx));
+    const media = mediaBlock(ctx);
+    mount.appendChild(media);
     mount.appendChild(sentenceCard(ctx.lesson));
     // optional context chip (e.g. "Abhi / Now") — beginner-friendly "when to say it"
     if (ctx.step.chip) {
@@ -87,8 +94,9 @@ window.SpeakX = window.SpeakX || {};
         el("div", { class: "chip-row" }, [el("span", { class: "context-chip" }, ctx.step.chip)])
       );
     }
+    const listenBtn = audioButton(ctx, { primary: true });
     mount.appendChild(
-      el("div", { class: "listen-line" }, [audioButton(ctx, { primary: true }), el("span", { class: "lbl" }, "Listen")])
+      el("div", { class: "listen-line" }, [listenBtn, el("span", { class: "lbl" }, "Listen")])
     );
     mount.appendChild(el("div", { class: "grow" }));
     mount.appendChild(
@@ -99,8 +107,20 @@ window.SpeakX = window.SpeakX || {};
         }, "Continue"),
       ])
     );
-    // auto-play once on entry
-    setTimeout(() => ctx.playAudio(), 350);
+    // Sentence audio plays only when the user taps Listen (no auto-play on entry).
+
+    // Glow the Listen button when the video reaches its "tap the button below"
+    // cue, guiding the user to tap. The glow stops once the user taps.
+    const video = media.querySelector("video");
+    const cue = ctx.lesson.listenCueTime;
+    if (video && typeof cue === "number") {
+      let tapped = false;
+      listenBtn.addEventListener("click", () => { tapped = true; listenBtn.classList.remove("glow"); });
+      video.addEventListener("timeupdate", () => {
+        if (tapped) return;
+        listenBtn.classList.toggle("glow", video.currentTime >= cue);
+      });
+    }
   };
 
   /* ---------------- SCREEN 2: Speak Now ---------------- */

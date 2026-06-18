@@ -10,10 +10,11 @@ window.SpeakX.LessonCompleteScreen = function (root, { situationId, onContinue }
   const el = ui.el.bind(ui);
   const situation = window.SpeakX.situations[situationId];
 
-  // collect the sentences learned from tasks that had a lesson
-  const learned = situation.tasks
-    .filter((t) => t.lesson)
-    .map((t) => t.lesson.sentence.en);
+  // sentences to celebrate: explicit list from data if provided,
+  // else derived from tasks that had a lesson
+  const learned =
+    (situation.complete && situation.complete.sentences) ||
+    situation.tasks.filter((t) => t.lesson).map((t) => t.lesson.sentence.en);
 
   const learnedPills = learned.map((s) =>
     el("div", { class: "learned-pill" }, [el("span", {}, "✅"), s])

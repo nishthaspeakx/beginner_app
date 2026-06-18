@@ -43,6 +43,12 @@ window.SpeakX.situations = {
     complete: {
       title: "Lesson Complete",
       message: "Aaj aapne shopkeeper se English mein baat karna seekha.",
+      // Sentences shown as completed cards on the Lesson Complete screen.
+      sentences: [
+        "Hello, I want cookies.",
+        "How much is it for?",
+        "I will pay in cash.",
+      ],
     },
     tasks: [
       {
@@ -58,6 +64,10 @@ window.SpeakX.situations = {
             hi: "नमस्ते, मुझे बिस्कुट चाहिए।",
           },
           audio: "assets/sentence_hello_cookies.mp3",
+          video: "assets/sia_shopkeeper_cookies.mp4",
+          // Seconds into the video where the voice says "neeche diye gaye
+          // button ko dabaye" — the Listen button glows from here to guide taps.
+          listenCueTime: 6.2,
           images: {
             shop: "assets/kirana_shop.jpg",
             shopkeeper: "assets/shopkeeper.jpg",
@@ -140,7 +150,10 @@ window.SpeakX.situations = {
         lesson: {
           sentence: { en: "I am going.", hi: "मैं जा रहा हूँ।" },
           audio: "assets/g_present.mp3", // mocked TTS; swap for real audio later
-          placeholder: true,
+          video: "assets/i_am_going.mp4",
+          // Seconds into the video where the voice cues "button dabaye" —
+          // the Listen button glows from here to guide taps.
+          listenCueTime: 5.3,
           placeholderLabel: "Grammar Practice",
           coinPerStep: 2,
           steps: [
@@ -164,7 +177,10 @@ window.SpeakX.situations = {
         lesson: {
           sentence: { en: "I was going.", hi: "मैं जा रहा था।" },
           audio: "assets/g_past.mp3",
-          placeholder: true,
+          video: "assets/i_was_going.mp4",
+          // Seconds into the video where the voice cues "button dabaye" —
+          // the Listen button glows from here to guide taps.
+          listenCueTime: 5.8,
           placeholderLabel: "Grammar Practice",
           coinPerStep: 2,
           steps: [
@@ -188,7 +204,10 @@ window.SpeakX.situations = {
         lesson: {
           sentence: { en: "I will go.", hi: "मैं जाऊँगा।" },
           audio: "assets/g_future.mp3",
-          placeholder: true,
+          video: "assets/i_will_go.mp4",
+          // Seconds into the video where the voice cues "button dabaye" —
+          // the Listen button glows from here to guide taps.
+          listenCueTime: 4.8,
           placeholderLabel: "Grammar Practice",
           coinPerStep: 2,
           steps: [
