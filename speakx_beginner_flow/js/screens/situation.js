@@ -29,7 +29,7 @@ window.SpeakX.SituationScreen = function (root, opts) {
 
   function buildMedia(m) {
     if (m.type === "video") {
-      const video = el("video", { src: m.src, muted: "", loop: "", autoplay: "", playsinline: "", preload: "auto" });
+      const video = el("video", { src: m.src, muted: "", loop: "", autoplay: "", playsinline: "", preload: "auto", poster: m.poster || "" });
       video.muted = true;
       const soundBtn = el("button", { class: "sound-toggle", title: "Sound" }, "🔇");
       soundBtn.addEventListener("click", () => {

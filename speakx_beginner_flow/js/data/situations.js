@@ -36,6 +36,7 @@ window.SpeakX.situations = {
     media: {
       type: "video", // 'video' now; swap to 'image' placeholder if needed
       src: "assets/kirana_training_video.mp4",
+      poster: "assets/kirana_shop.jpg", // shown instead of black before play
       badge: "Kirana Shop",
     },
     // kirana = first card; after task 1 the demo auto-completes the rest.

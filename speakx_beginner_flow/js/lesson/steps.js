@@ -257,13 +257,21 @@ window.SpeakX = window.SpeakX || {};
       autoplay: "",
       playsinline: "",
       preload: "auto",
+      // poster = shop frame so it never shows black if autoplay-with-sound is blocked
+      poster: (ctx.lesson.images && ctx.lesson.images.shop) || "",
       controlslist: "nodownload nofullscreen noremoteplayback",
       disablepictureinpicture: "",
     });
     video.controls = false;
     video.loop = false;
     video.muted = false;
-    video.play && video.play().catch(() => {});
+    // Try to autoplay with sound; if the browser blocks it, fall back to a
+    // muted autoplay so the scene still animates (audio resumes on first tap).
+    const tryPlay = video.play && video.play();
+    if (tryPlay && tryPlay.catch) {
+      tryPlay.catch(() => { video.muted = true; video.play().catch(() => {}); });
+    }
+    video.addEventListener("click", () => { video.muted = false; video.play().catch(() => {}); });
     mount.appendChild(el("div", { class: "lesson-photo" }, [video]));
 
     // Change 2: shopkeeper dialogue card (same container/avatar/styling, text only)
