@@ -30,7 +30,7 @@ window.SpeakX.HomeScreen = function (root, { onStart }) {
 
   const body = el("div", { class: "screen-body" }, [
     el("div", { class: "home-hero" }, [
-      el("h1", {}, "Family ke saath baat karo"),
+      el("h1", {}, "English mein shopping karo"),
       el("p", {}, "500+ sentences seekhein aur baat kare"),
     ]),
     el("div", { class: "level-box" }, [
@@ -51,11 +51,9 @@ window.SpeakX.HomeScreen = function (root, { onStart }) {
       done ? el("div", { class: "done-badge" }, [el("span", {}, "✓"), "Completed"]) : null,
       el("h3", {}, situation.home.title),
       el("div", { class: "sub" }, situation.home.subtitle),
-      el("button", { class: "btn-start", onClick: () => onStart(situation.id) }, [
-        done ? "Review" : "Start",
-        // Surprise Gift pill is part of the existing card design (first card only)
-        isFirst ? el("span", { class: "gift-pill" }, ["🎁", "Surprise Gift"]) : null,
-      ]),
+      el("button", { class: "btn-start", onClick: () => onStart(situation.id) },
+        done ? "Review" : "Start"
+      ),
     ]);
   }
 
