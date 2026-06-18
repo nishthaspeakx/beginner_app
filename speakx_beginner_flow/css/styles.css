@@ -377,7 +377,7 @@ html, body {
   margin: 10px 16px 0; border-radius: var(--radius-lg); overflow: hidden;
   height: 30vh; max-height: 270px; min-height: 160px; background: #11131A; box-shadow: var(--shadow-card);
 }
-.lesson-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.lesson-photo img, .lesson-photo video { width: 100%; height: 100%; object-fit: cover; display: block; }
 .lesson-photo.avatar { height: auto; min-height: 0; width: 130px; margin: 8px auto 0; border-radius: 50%; aspect-ratio: 1; }
 
 /* Sentence card */

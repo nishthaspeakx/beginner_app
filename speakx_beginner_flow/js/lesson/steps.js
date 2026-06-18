@@ -248,32 +248,72 @@ window.SpeakX = window.SpeakX || {};
     });
   };
 
-  /* ---------------- SCREEN 5: Real Life Practice ---------------- */
+  /* ---------------- SCREEN 5: Real Life Practice (video + read-along) ---------------- */
   S.realLife = function (ctx, mount) {
-    mount.appendChild(
-      el("div", { class: "lesson-photo" }, [el("img", { src: ctx.lesson.images.shop, alt: "Kirana shop" })])
-    );
+    // Change 1: top media is the uploaded training video (autoplay once, audio on,
+    // no controls, holds last frame). Same area / rounded corners as the image.
+    const video = el("video", {
+      src: ctx.step.video,
+      autoplay: "",
+      playsinline: "",
+      preload: "auto",
+      controlslist: "nodownload nofullscreen noremoteplayback",
+      disablepictureinpicture: "",
+    });
+    video.controls = false;
+    video.loop = false;
+    video.muted = false;
+    video.play && video.play().catch(() => {});
+    mount.appendChild(el("div", { class: "lesson-photo" }, [video]));
+
+    // Change 2: shopkeeper dialogue card (same container/avatar/styling, text only)
     mount.appendChild(
       el("div", { class: "convo-card" }, [
         el("div", { class: "convo-line" }, [el("span", {}, "👨"), ctx.step.shopkeeperLine]),
       ])
     );
-    mount.appendChild(el("div", { class: "convo-q" }, ctx.step.question));
 
-    const btn = el("button", { class: "answer-btn" }, ctx.step.answer);
-    mount.appendChild(btn);
-
+    // Change 3: Read-Along UI (same style as the Speak/Read-Along screen):
+    // audio button → circular image → sentence card → Speak Now mic.
+    mount.appendChild(audioButton(ctx, { cls: "center" }));
+    mount.appendChild(
+      el("div", { class: "lesson-photo avatar" }, [el("img", { src: ctx.lesson.images.shop, alt: "Kirana shop" })])
+    );
+    const card = el("div", { class: "sentence-card active" }, [
+      el("div", { class: "en" }, ctx.step.answer),
+      el("div", { class: "divider" }),
+      el("div", { class: "hi" }, ctx.step.answerHi || ctx.lesson.sentence.hi),
+    ]);
+    mount.appendChild(card);
     mount.appendChild(el("div", { class: "grow" }));
-    const footerHolder = el("div", {});
-    mount.appendChild(footerHolder);
 
-    btn.addEventListener("click", () => {
-      btn.classList.add("correct");
-      btn.style.pointerEvents = "none";
-      ctx.playAudio();
+    const controls = el("div", {}, [
+      el("div", { class: "speak-label" }, [el("span", { class: "speak-tooltip" }, "Speak Now")]),
+      el("div", { class: "mic-row" }, []),
+    ]);
+    const micRow = controls.querySelector(".mic-row");
+    const retry = el("button", { class: "side-btn", title: "Retry" }, "↺");
+    const mic = el("button", { class: "mic-btn", title: "Speak" }, "🎤");
+    const skip = el("button", { class: "side-btn" }, "Skip");
+    micRow.append(retry, mic, skip);
+    mount.appendChild(controls);
+
+    const finish = () => {
+      controls.remove();
+      card.classList.add("correct");
       ctx.addCoins();
-      footerHolder.appendChild(S.SuccessPanel("CORRECT!", ctx.done));
+      mount.appendChild(S.SuccessPanel("CORRECT!", ctx.done));
+    };
+    mic.addEventListener("click", () => {
+      mic.classList.add("listening");
+      mic.textContent = "🎙️";
+      setTimeout(() => finish(), 1000); // mock listening (same as Speak)
     });
+    retry.addEventListener("click", () => {
+      mic.classList.remove("listening");
+      mic.textContent = "🎤";
+    });
+    skip.addEventListener("click", finish);
   };
 
   /* ---------------- MCQ (question + helper + options) ---------------- */
