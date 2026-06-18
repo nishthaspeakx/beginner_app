@@ -281,12 +281,8 @@ window.SpeakX = window.SpeakX || {};
       ])
     );
 
-    // Change 3: Read-Along UI (same style as the Speak/Read-Along screen):
-    // audio button → circular image → sentence card → Speak Now mic.
-    mount.appendChild(audioButton(ctx, { cls: "center" }));
-    mount.appendChild(
-      el("div", { class: "lesson-photo avatar" }, [el("img", { src: ctx.lesson.images.shop, alt: "Kirana shop" })])
-    );
+    // Change 3: Read-Along UI: sentence card → Speak Now mic.
+    // (audio button + circular image removed per request)
     const card = el("div", { class: "sentence-card active" }, [
       el("div", { class: "en" }, ctx.step.answer),
       el("div", { class: "divider" }),
