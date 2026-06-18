@@ -51,9 +51,9 @@ window.SpeakX.HomeScreen = function (root, { onStart }) {
       done ? el("div", { class: "done-badge" }, [el("span", {}, "✓"), "Completed"]) : null,
       el("h3", {}, situation.home.title),
       el("div", { class: "sub" }, situation.home.subtitle),
-      el("button", { class: "btn-start", onClick: () => onStart(situation.id) }, [
-        done ? "Review" : "Start",
-      ]),
+      el("button", { class: "btn-start", onClick: () => onStart(situation.id) },
+        done ? "Review" : "Start"
+      ),
     ]);
   }
 

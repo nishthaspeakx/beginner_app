@@ -36,6 +36,7 @@ window.SpeakX.situations = {
     media: {
       type: "video", // 'video' now; swap to 'image' placeholder if needed
       src: "assets/kirana_training_video.mp4",
+      poster: "assets/kirana_shop.jpg", // shown instead of black before play
       badge: "Kirana Shop",
     },
     // kirana = first card; after task 1 the demo auto-completes the rest.
@@ -92,9 +93,10 @@ window.SpeakX.situations = {
             },
             {
               type: "realLife",
-              shopkeeperLine: "Namaste ji, kya chahiye?",
-              question: "Aap English mein kya bolenge?",
+              shopkeeperLine: "Namaste, What do you want?",
               answer: "Hello, I want cookies.",
+              answerHi: "नमस्ते, मुझे कुकीज़ चाहिए।",
+              video: "assets/kirana_dialogue_16x9_edited.mp4",
             },
           ],
         },
